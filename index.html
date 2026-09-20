@@ -1,0 +1,1218 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="theme-color"
+        content="#008C99"
+    >
+
+    <meta
+        name="description"
+        content="GI-COLLECTE V2 - Africa's Light - Gestion et traçabilité des dons humanitaires"
+    >
+
+    <title>
+        GI-COLLECTE V2 | Africa's Light
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+
+    <!-- jsPDF -->
+    <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"
+    ></script>
+
+</head>
+
+<body>
+
+<!-- =====================================================
+     HEADER
+===================================================== -->
+
+<header class="header">
+
+    <div class="header-container">
+
+        <div class="brand">
+
+            <div class="brand-logo">
+                <img
+                    src="logo-africas-light.png"
+                    alt="Africa's Light"
+                    onerror="this.style.display='none'"
+                >
+            </div>
+
+            <div>
+
+                <h1>Africa's Light</h1>
+
+                <p>
+                    Hope for Every Child
+                </p>
+
+            </div>
+
+        </div>
+
+        <div class="gicode-brand">
+
+            <strong>GI.CODE</strong>
+
+            <span>
+                Compétences • Digitales • Innovation • Impact
+            </span>
+
+        </div>
+
+    </div>
+
+</header>
+
+
+<!-- =====================================================
+     NAVIGATION
+===================================================== -->
+
+<nav class="navigation">
+
+    <button
+        class="nav-btn active"
+        onclick="showSection('collecte', this)"
+    >
+        ➕ Nouvelle collecte
+    </button>
+
+    <button
+        class="nav-btn"
+        onclick="showSection('dashboard', this)"
+    >
+        📊 Tableau de bord
+    </button>
+
+    <button
+        class="nav-btn"
+        onclick="showSection('historique', this)"
+    >
+        📋 Historique
+    </button>
+
+</nav>
+
+
+<main class="container">
+
+
+<!-- =====================================================
+     SECTION COLLECTE
+===================================================== -->
+
+<section
+    id="collecte"
+    class="section active"
+>
+
+    <div class="hero-card">
+
+        <div>
+
+            <span class="badge">
+                GI-COLLECTE V2
+            </span>
+
+            <h2>
+                Collecte humanitaire
+            </h2>
+
+            <p>
+                Outil numérique de gestion, de suivi et de
+                traçabilité des dons de l'association
+                <strong>Africa's Light</strong>.
+            </p>
+
+        </div>
+
+        <div class="priority">
+
+            <div class="priority-icon">
+                ❤️
+            </div>
+
+            <div>
+
+                <strong>
+                    Priorité aux enfants vulnérables
+                </strong>
+
+                <span>
+                    Orphelins • Filles vulnérables •
+                    Enfants abandonnés
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =================================================
+         FORMULAIRE
+    ================================================= -->
+
+    <form
+        id="donationForm"
+        onsubmit="enregistrerContribution(event)"
+    >
+
+
+        <!-- =============================================
+             IDENTIFICATION
+        ============================================== -->
+
+        <div class="card">
+
+            <div class="card-title">
+
+                <span class="number">
+                    1
+                </span>
+
+                <div>
+
+                    <h3>
+                        Identification du donateur
+                    </h3>
+
+                    <p>
+                        Personne, entreprise, association
+                        ou partenaire
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="grid">
+
+                <div class="field">
+
+                    <label>
+                        Nom et prénom
+                    </label>
+
+                    <input
+                        type="text"
+                        id="nom"
+                        placeholder="Nom et prénom"
+                    >
+
+                </div>
+
+
+                <div class="field">
+
+                    <label>
+                        Type de donateur
+                    </label>
+
+                    <select id="typeDonateur">
+
+                        <option value="">
+                            Sélectionner
+                        </option>
+
+                        <option>
+                            Particulier
+                        </option>
+
+                        <option>
+                            Entreprise
+                        </option>
+
+                        <option>
+                            Association
+                        </option>
+
+                        <option>
+                            ONG
+                        </option>
+
+                        <option>
+                            Institution
+                        </option>
+
+                        <option>
+                            Partenaire
+                        </option>
+
+                        <option>
+                            Membre / bénévole
+                        </option>
+
+                        <option>
+                            Autre
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="field">
+
+                    <label>
+                        Téléphone
+                    </label>
+
+                    <input
+                        type="tel"
+                        id="telephone"
+                        placeholder="77 000 00 00"
+                    >
+
+                </div>
+
+
+                <div class="field">
+
+                    <label>
+                        Adresse / quartier
+                    </label>
+
+                    <input
+                        type="text"
+                        id="adresse"
+                        placeholder="Adresse ou quartier"
+                    >
+
+                </div>
+
+
+                <div class="field">
+
+                    <label>
+                        Commune
+                    </label>
+
+                    <input
+                        type="text"
+                        id="commune"
+                        placeholder="Ex : Mbao"
+                    >
+
+                </div>
+
+
+                <div class="field">
+
+                    <label>
+                        Identifiant présenté
+                    </label>
+
+                    <select id="identifiant">
+
+                        <option value="">
+                            Aucun
+                        </option>
+
+                        <option>
+                            CNI
+                        </option>
+
+                        <option>
+                            Passeport
+                        </option>
+
+                        <option>
+                            Carte professionnelle
+                        </option>
+
+                        <option>
+                            Carte de membre
+                        </option>
+
+                        <option>
+                            Autre
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="field">
+
+                    <label>
+                        Numéro de l'identifiant
+                    </label>
+
+                    <input
+                        type="text"
+                        id="numeroIdentifiant"
+                        placeholder="Facultatif"
+                    >
+
+                </div>
+
+            </div>
+
+
+            <label class="checkbox">
+
+                <input
+                    type="checkbox"
+                    id="anonyme"
+                >
+
+                <span>
+                    Le donateur souhaite rester anonyme
+                </span>
+
+            </label>
+
+        </div>
+
+
+        <!-- =============================================
+             TYPE DE DON
+        ============================================== -->
+
+        <div class="card">
+
+            <div class="card-title">
+
+                <span class="number">
+                    2
+                </span>
+
+                <div>
+
+                    <h3>
+                        Nature du don
+                    </h3>
+
+                    <p>
+                        Précisez ce qui est donné à
+                        Africa's Light
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="donation-types">
+
+                <label class="donation-option">
+
+                    <input
+                        type="radio"
+                        name="typeDon"
+                        value="Argent"
+                        checked
+                    >
+
+                    <span>
+                        💰
+                        <strong>Argent</strong>
+                    </span>
+
+                </label>
+
+
+                <label class="donation-option">
+
+                    <input
+                        type="radio"
+                        name="typeDon"
+                        value="Alimentaire"
+                    >
+
+                    <span>
+                        🍚
+                        <strong>Alimentaire</strong>
+                    </span>
+
+                </label>
+
+
+                <label class="donation-option">
+
+                    <input
+                        type="radio"
+                        name="typeDon"
+                        value="Fournitures scolaires"
+                    >
+
+                    <span>
+                        📚
+                        <strong>Fournitures scolaires</strong>
+                    </span>
+
+                </label>
+
+
+                <label class="donation-option">
+
+                    <input
+                        type="radio"
+                        name="typeDon"
+                        value="Vêtements"
+                    >
+
+                    <span>
+                        👕
+                        <strong>Vêtements</strong>
+                    </span>
+
+                </label>
+
+
+                <label class="donation-option">
+
+                    <input
+                        type="radio"
+                        name="typeDon"
+                        value="Médical"
+                    >
+
+                    <span>
+                        🏥
+                        <strong>Médical</strong>
+                    </span>
+
+                </label>
+
+
+                <label class="donation-option">
+
+                    <input
+                        type="radio"
+                        name="typeDon"
+                        value="Matériel"
+                    >
+
+                    <span>
+                        🧰
+                        <strong>Matériel</strong>
+                    </span>
+
+                </label>
+
+
+                <label class="donation-option">
+
+                    <input
+                        type="radio"
+                        name="typeDon"
+                        value="Parrainage"
+                    >
+
+                    <span>
+                        👶
+                        <strong>Parrainage</strong>
+                    </span>
+
+                </label>
+
+
+                <label class="donation-option">
+
+                    <input
+                        type="radio"
+                        name="typeDon"
+                        value="Autre"
+                    >
+
+                    <span>
+                        📦
+                        <strong>Autre</strong>
+                    </span>
+
+                </label>
+
+            </div>
+
+
+            <div class="field">
+
+                <label>
+                    Description du don
+                </label>
+
+                <textarea
+                    id="descriptionDon"
+                    rows="3"
+                    placeholder="Ex : 2 sacs de riz, 20 cahiers, vêtements enfants..."
+                ></textarea>
+
+            </div>
+
+        </div>
+
+
+        <!-- =============================================
+             DESTINATION
+        ============================================== -->
+
+        <div class="card priority-card">
+
+            <div class="card-title">
+
+                <span class="number">
+                    3
+                </span>
+
+                <div>
+
+                    <h3>
+                        Destination du don
+                    </h3>
+
+                    <p>
+                        À quel besoin humanitaire le don
+                        est-il destiné ?
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="destination-grid">
+
+                <label>
+
+                    <input
+                        type="radio"
+                        name="destination"
+                        value="Orphelins"
+                        checked
+                    >
+
+                    <span>
+                        👶
+                        <strong>Orphelins</strong>
+                    </span>
+
+                </label>
+
+
+                <label>
+
+                    <input
+                        type="radio"
+                        name="destination"
+                        value="Éducation"
+                    >
+
+                    <span>
+                        📚
+                        <strong>Éducation</strong>
+                    </span>
+
+                </label>
+
+
+                <label>
+
+                    <input
+                        type="radio"
+                        name="destination"
+                        value="Nutrition"
+                    >
+
+                    <span>
+                        🍲
+                        <strong>Nutrition</strong>
+                    </span>
+
+                </label>
+
+
+                <label>
+
+                    <input
+                        type="radio"
+                        name="destination"
+                        value="Santé"
+                    >
+
+                    <span>
+                        🏥
+                        <strong>Santé</strong>
+                    </span>
+
+                </label>
+
+
+                <label>
+
+                    <input
+                        type="radio"
+                        name="destination"
+                        value="Accompagnement psychosocial"
+                    >
+
+                    <span>
+                        ❤️
+                        <strong>Psychosocial</strong>
+                    </span>
+
+                </label>
+
+
+                <label>
+
+                    <input
+                        type="radio"
+                        name="destination"
+                        value="Centre / structure"
+                    >
+
+                    <span>
+                        🏠
+                        <strong>Centre</strong>
+                    </span>
+
+                </label>
+
+
+                <label>
+
+                    <input
+                        type="radio"
+                        name="destination"
+                        value="Fonds général"
+                    >
+
+                    <span>
+                        🌍
+                        <strong>Fonds général</strong>
+                    </span>
+
+                </label>
+
+            </div>
+
+        </div>
+
+
+        <!-- =============================================
+             CONTRIBUTION FINANCIERE
+        ============================================== -->
+
+        <div class="card">
+
+            <div class="card-title">
+
+                <span class="number">
+                    4
+                </span>
+
+                <div>
+
+                    <h3>
+                        Contribution financière
+                    </h3>
+
+                    <p>
+                        À renseigner lorsqu'il s'agit
+                        d'un don financier
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="grid">
+
+                <div class="field">
+
+                    <label>
+                        Montant versé (FCFA)
+                    </label>
+
+                    <input
+                        type="number"
+                        id="montant"
+                        min="0"
+                        step="1"
+                        placeholder="Ex : 10000"
+                    >
+
+                </div>
+
+
+                <div class="field">
+
+                    <label>
+                        Mode de paiement
+                    </label>
+
+                    <select id="modePaiement">
+
+                        <option value="">
+                            Sélectionner
+                        </option>
+
+                        <option>
+                            Espèces
+                        </option>
+
+                        <option>
+                            Wave
+                        </option>
+
+                        <option>
+                            Orange Money
+                        </option>
+
+                        <option>
+                            Free Money
+                        </option>
+
+                        <option>
+                            Virement bancaire
+                        </option>
+
+                        <option>
+                            Chèque
+                        </option>
+
+                        <option>
+                            Autre
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="field">
+
+                    <label>
+                        Référence de transaction
+                    </label>
+
+                    <input
+                        type="text"
+                        id="reference"
+                        placeholder="Référence si disponible"
+                    >
+
+                </div>
+
+
+                <div class="field">
+
+                    <label>
+                        Date du don
+                    </label>
+
+                    <input
+                        type="date"
+                        id="dateDon"
+                    >
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =============================================
+             COLLECTEUR
+        ============================================== -->
+
+        <div class="card">
+
+            <div class="card-title">
+
+                <span class="number">
+                    5
+                </span>
+
+                <div>
+
+                    <h3>
+                        Collecte
+                    </h3>
+
+                    <p>
+                        Personne chargée d'enregistrer
+                        le don
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="grid">
+
+                <div class="field">
+
+                    <label>
+                        Nom du collecteur
+                    </label>
+
+                    <input
+                        type="text"
+                        id="collecteur"
+                        placeholder="Nom du collecteur"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="field">
+
+                    <label>
+                        Zone de collecte
+                    </label>
+
+                    <input
+                        type="text"
+                        id="zone"
+                        placeholder="Quartier / zone"
+                        required
+                    >
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =============================================
+             BOUTON
+        ============================================== -->
+
+        <div class="submit-area">
+
+            <button
+                type="submit"
+                class="btn-primary"
+            >
+                ✓ Enregistrer la contribution
+            </button>
+
+        </div>
+
+    </form>
+
+
+    <!-- =============================================
+         CONFIRMATION
+    ============================================== -->
+
+    <div
+        id="confirmation"
+        class="confirmation hidden"
+    >
+
+        <div class="success-icon">
+            ✓
+        </div>
+
+        <h2>
+            DON ENREGISTRÉ
+        </h2>
+
+        <p>
+            La contribution a été enregistrée
+            avec succès.
+        </p>
+
+        <div
+            id="confirmationDetails"
+            class="confirmation-details"
+        ></div>
+
+        <div class="actions">
+
+            <button
+                onclick="telechargerPDF()"
+                class="btn-primary"
+            >
+                📄 Télécharger le reçu PDF
+            </button>
+
+            <button
+                onclick="nouvelleContribution()"
+                class="btn-secondary"
+            >
+                + Nouvelle contribution
+            </button>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     DASHBOARD
+===================================================== -->
+
+<section
+    id="dashboard"
+    class="section"
+>
+
+    <div class="section-header">
+
+        <div>
+
+            <span class="badge">
+                STATISTIQUES
+            </span>
+
+            <h2>
+                Tableau de bord
+            </h2>
+
+            <p>
+                Vue synthétique des contributions
+                enregistrées.
+            </p>
+
+        </div>
+
+        <button
+            class="btn-secondary"
+            onclick="actualiserDashboard()"
+        >
+            ↻ Actualiser
+        </button>
+
+    </div>
+
+
+    <div class="stats-grid">
+
+        <div class="stat-card">
+
+            <span>
+                💰
+            </span>
+
+            <strong id="statMontant">
+                0 FCFA
+            </strong>
+
+            <small>
+                Total financier
+            </small>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <span>
+                🤝
+            </span>
+
+            <strong id="statDons">
+                0
+            </strong>
+
+            <small>
+                Contributions
+            </small>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <span>
+                👶
+            </span>
+
+            <strong id="statOrphelins">
+                0
+            </strong>
+
+            <small>
+                Dons destinés aux orphelins
+            </small>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <span>
+                📚
+            </span>
+
+            <strong id="statEducation">
+                0
+            </strong>
+
+            <small>
+                Dons éducation
+            </small>
+
+        </div>
+
+    </div>
+
+
+    <div class="dashboard-grid">
+
+        <div class="card">
+
+            <h3>
+                Répartition par destination
+            </h3>
+
+            <div id="destinationStats"></div>
+
+        </div>
+
+
+        <div class="card">
+
+            <h3>
+                Répartition par type de don
+            </h3>
+
+            <div id="typeStats"></div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     HISTORIQUE
+===================================================== -->
+
+<section
+    id="historique"
+    class="section"
+>
+
+    <div class="section-header">
+
+        <div>
+
+            <span class="badge">
+                TRAÇABILITÉ
+            </span>
+
+            <h2>
+                Historique des contributions
+            </h2>
+
+        </div>
+
+        <div class="history-actions">
+
+            <button
+                class="btn-secondary"
+                onclick="exporterCSV()"
+            >
+                📥 Export CSV
+            </button>
+
+            <button
+                class="btn-danger"
+                onclick="supprimerToutesLesDonnees()"
+            >
+                🗑️ Effacer
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <div class="search-box">
+
+        <input
+            type="search"
+            id="recherche"
+            placeholder="Rechercher par donateur, numéro, zone..."
+            oninput="afficherHistorique()"
+        >
+
+    </div>
+
+
+    <div
+        id="historiqueContainer"
+        class="history-container"
+    ></div>
+
+</section>
+
+</main>
+
+
+<footer>
+
+    <div>
+
+        <strong>
+            Africa's Light
+        </strong>
+
+        <span>
+            Hope for Every Child
+        </span>
+
+    </div>
+
+    <div>
+
+        GI-COLLECTE V2
+
+        <br>
+
+        Gestion numérique des dons humanitaires
+
+    </div>
+
+    <div>
+
+        Conçu par
+        <strong>
+            Gi.Code Formation
+        </strong>
+
+    </div>
+
+</footer>
+
+
+<script src="script.js"></script>
+
+</body>
+
+</html>
