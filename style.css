@@ -1224,3 +1224,101 @@ footer strong {
     }
 
 }
+
+
+
+/* =====================================================
+   AFRICA'S LIGHT — ESPACE DE PAIEMENT WAVE
+===================================================== */
+
+.wave-qr-container {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    margin-top: 24px;
+    padding: 24px;
+    background: #f0fbfc;
+    border: 1px solid #b8e5e8;
+    border-radius: 16px;
+    text-align: center;
+}
+
+.wave-qr-container h3 {
+    margin-bottom: 12px;
+    color: #008c99;
+    font-size: 1.35rem;
+}
+
+.wave-qr-container p {
+    line-height: 1.6;
+}
+
+.wave-qr-figure {
+    margin: 20px auto;
+}
+
+.wave-qr-image {
+    display: block;
+    width: 100%;
+    max-width: 280px;
+    height: auto;
+    margin: 0 auto;
+    padding: 8px;
+    box-sizing: border-box;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+}
+
+.wave-qr-figure figcaption {
+    margin-top: 12px;
+    color: #008c99;
+    font-weight: bold;
+}
+
+.wave-qr-warning {
+    margin-top: 16px;
+    padding: 12px;
+    background: #fff8e1;
+    border-radius: 8px;
+    font-size: 13px;
+}
+
+/* Adaptation aux petits écrans */
+
+@media (max-width: 600px) {
+    .wave-qr-container {
+        padding: 16px;
+    }
+
+    .wave-qr-image {
+        max-width: 240px;
+    }
+}
+
+
+
+
+
+.history-description {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: 100%;
+    box-sizing: border-box;
+    margin: 8px 0;
+    padding: 12px 14px;
+    background: #f0fbfc;
+    border-left: 4px solid #008c99;
+    border-radius: 8px;
+    overflow-wrap: anywhere;
+    line-height: 1.6;
+}
+
+.history-description strong {
+    color: #008c99;
+}
+
+.history-description span {
+    color: #334155;
+}

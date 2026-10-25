@@ -5,18 +5,188 @@
 
 
 /* =====================================================
-   CONFIGURATION
+   CONFIGURATION GI-COLLECTE V2 — AFRICA'S LIGHT
 ===================================================== */
 
 const CONFIG = {
-
+    apiUrl: "https://script.google.com/macros/s/AKfycbz6jysH1ltjpFTYHeGiU4f_9Jsf2K6KMCFGmaZh11jd7DOsmL9pKGoTV2qEMglb7O0ZIQ/exec",
     storageKey: "africasLightContributions",
-
     prefix: "ALA",
-
     year: new Date().getFullYear()
-
 };
+
+
+/* =====================================================
+   CONNEXION GOOGLE SHEETS
+===================================================== */
+
+let contributionsCache = [];
+let chargementContributions = false;
+
+/**
+ * Lit les contributions grâce à JSONP.
+ * Cette méthode évite les problèmes CORS habituels
+ * des requêtes GET vers Google Apps Script.
+ */
+function chargerContributionsDepuisGoogle() {
+    return new Promise((resolve, reject) => {
+        const callbackName =
+            "giCodeCallback_" +
+            Date.now() +
+            "_" +
+            Math.floor(Math.random() * 100000);
+
+        const script = document.createElement("script");
+
+        const timeout = setTimeout(() => {
+            nettoyer();
+
+            reject(
+                new Error(
+                    "Délai dépassé lors de la lecture de Google Sheets."
+                )
+            );
+        }, 15000);
+
+        function nettoyer() {
+            clearTimeout(timeout);
+            delete window[callbackName];
+
+            if (script.parentNode) {
+                script.parentNode.removeChild(script);
+            }
+        }
+
+        window[callbackName] = function (resultat) {
+            nettoyer();
+
+            if (!resultat || resultat.success !== true) {
+                reject(
+                    new Error(
+                        resultat?.message ||
+                        "Impossible de lire les contributions."
+                    )
+                );
+
+                return;
+            }
+
+            contributionsCache = Array.isArray(resultat.data)
+                ? resultat.data
+                : [];
+
+            resolve(contributionsCache);
+        };
+
+        script.onerror = function () {
+            nettoyer();
+
+            reject(
+                new Error(
+                    "Impossible de contacter Google Apps Script."
+                )
+            );
+        };
+
+        const separator = CONFIG.apiUrl.includes("?")
+            ? "&"
+            : "?";
+
+        script.src =
+            CONFIG.apiUrl +
+            separator +
+            "action=lister&callback=" +
+            encodeURIComponent(callbackName);
+
+        document.head.appendChild(script);
+    });
+}
+
+/**
+ * Retourne le cache chargé depuis Google Sheets.
+ * Les fonctions existantes peuvent ainsi continuer
+ * à utiliser getContributions().
+ */
+function getContributions() {
+    return contributionsCache.slice();
+}
+
+/**
+ * Recalcule les statistiques et actualise l'historique
+ * après le chargement des données centralisées.
+ */
+async function actualiserDepuisGoogle() {
+    if (chargementContributions) {
+        return;
+    }
+
+    chargementContributions = true;
+
+    try {
+        await chargerContributionsDepuisGoogle();
+
+        actualiserDashboard();
+        afficherHistorique();
+
+    } catch (error) {
+        console.error(error);
+
+        alert(
+            "Impossible de charger les contributions Google Sheets. " +
+            "Vérifiez le déploiement de l'API et votre connexion."
+        );
+
+    } finally {
+        chargementContributions = false;
+    }
+}
+
+/**
+ * Envoie une opération à Google Apps Script.
+ *
+ * Avec mode no-cors, le navigateur ne permet pas de lire
+ * la réponse POST. La vérification s'effectue ensuite
+ * en relisant les données depuis Google Sheets.
+ */
+async function envoyerVersGoogle(payload) {
+    await fetch(CONFIG.apiUrl, {
+        method: "POST",
+        mode: "no-cors",
+        headers: {
+            "Content-Type": "text/plain;charset=UTF-8"
+        },
+        body: JSON.stringify(payload)
+    });
+
+    // Laisser le temps au script Google de traiter la demande.
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    return await chargerContributionsDepuisGoogle();
+}
+
+/**
+ * Produit un identifiant provisoire à partir des IDs connus.
+ * L'identifiant est vérifié par l'API lors de l'enregistrement.
+ */
+function genererNumero() {
+    const prefixe = `${CONFIG.prefix}-${CONFIG.year}-`;
+
+    const numeros = contributionsCache
+        .map(item => {
+            if (!item.id || !item.id.startsWith(prefixe)) {
+                return 0;
+            }
+
+            return Number(item.id.slice(prefixe.length)) || 0;
+        });
+
+    const prochainNumero =
+        Math.max(0, ...numeros) + 1;
+
+    return prefixe +
+        String(prochainNumero).padStart(6, "0");
+}
+
 
 
 /* =====================================================
@@ -30,28 +200,42 @@ let contributionActuelle = null;
    INITIALISATION
 ===================================================== */
 
-document.addEventListener(
-    "DOMContentLoaded",
-    () => {
+document.addEventListener("DOMContentLoaded", async () => {
+    const date = document.getElementById("dateDon");
 
-        const date = document.getElementById("dateDon");
+    if (date) {
+        date.value = new Date().toISOString().split("T")[0];
+    }
 
-        if (date) {
+    const container =
+        document.getElementById("historiqueContainer");
 
-            date.value =
-                new Date()
-                .toISOString()
-                .split("T")[0];
+    if (container) {
+        container.innerHTML =
+            '<div class="card"><p>Chargement des contributions...</p></div>';
+    }
 
-        }
+    try {
+        await chargerContributionsDepuisGoogle();
 
         actualiserDashboard();
-
         afficherHistorique();
 
-    }
-);
+    } catch (error) {
+        console.error("Erreur de chargement :", error);
 
+        if (container) {
+            container.innerHTML = `
+                <div class="card">
+                    <p>Impossible de charger les contributions.</p>
+                    <button onclick="actualiserDepuisGoogle()">
+                        Réessayer
+                    </button>
+                </div>
+            `;
+        }
+    }
+});
 
 /* =====================================================
    STOCKAGE
@@ -257,10 +441,7 @@ function enregistrerContribution(event) {
 
         montant: montant,
 
-        modePaiement:
-            document
-                .getElementById("modePaiement")
-                .value,
+        modePaiement: "Wave",
 
         reference:
             document
@@ -275,18 +456,38 @@ function enregistrerContribution(event) {
     };
 
 
-    const contributions =
-        getContributions();
+    /* Enregistrement dans Google Sheets */
 
+envoyerVersGoogle({
+    action: "enregistrer",
+    data: contribution
+})
+.then(contributions => {
+    const enregistrementConfirme =
+        contributions.some(item => item.id === contribution.id);
 
-    contributions.push(
-        contribution
+    if (!enregistrementConfirme) {
+        throw new Error(
+            "La contribution n'a pas été retrouvée dans Google Sheets."
+        );
+    }
+
+    contributionActuelle =
+        contributions.find(item => item.id === contribution.id);
+
+    afficherConfirmation(contributionActuelle);
+
+    actualiserDashboard();
+    afficherHistorique();
+})
+.catch(error => {
+    console.error("Erreur d'enregistrement :", error);
+
+    alert(
+        "L'enregistrement n'a pas pu être confirmé dans Google Sheets. " +
+        "Vérifiez la feuille avant de réessayer afin d'éviter un doublon."
     );
-
-
-    saveContributions(
-        contributions
-    );
+});
 
 
     contributionActuelle =
@@ -358,6 +559,11 @@ function afficherConfirmation(data) {
                 <strong>Destination :</strong>
                 ${escapeHTML(data.destination)}
             </p>
+          
+              <p>
+                 <strong>Description du don :</strong>
+                ${escapeHTML(data.description || "Non renseignée")}
+              </p>
 
             <p>
                 <strong>Contribution :</strong>
@@ -705,100 +911,75 @@ function afficherStatsType(
 function afficherHistorique() {
 
     const container =
-        document.getElementById(
-            "historiqueContainer"
-        );
-
+        document.getElementById("historiqueContainer");
 
     const recherche =
         (
-            document
-                .getElementById("recherche")
-                ?.value || ""
+            document.getElementById("recherche")?.value || ""
         )
         .toLowerCase()
         .trim();
 
-
-    let contributions =
-        getContributions();
-
+    let contributions = getContributions();
 
     contributions =
         contributions
             .slice()
             .reverse()
-            .filter(
-                item => {
+            .filter(item => {
 
-                    if (!recherche) {
-
-                        return true;
-
-                    }
-
-
-                    const texte = [
-
-                        item.id,
-
-                        item.nom,
-
-                        item.telephone,
-
-                        item.commune,
-
-                        item.zone,
-
-                        item.collecteur,
-
-                        item.destination,
-
-                        item.typeDon
-
-                    ]
-                    .join(" ")
-                    .toLowerCase();
-
-
-                    return texte.includes(
-                        recherche
-                    );
-
+                if (!recherche) {
+                    return true;
                 }
-            );
 
+                const texte = [
+                    item.id,
+                    item.nom,
+                    item.telephone,
+                    item.commune,
+                    item.zone,
+                    item.collecteur,
+                    item.destination,
+                    item.typeDon,
+                    item.description
+                ]
+                .join(" ")
+                .toLowerCase();
+
+                return texte.includes(recherche);
+
+            });
 
     if (!contributions.length) {
 
         container.innerHTML = `
-
             <div class="card">
-
-                <p>
-                    Aucune contribution trouvée.
-                </p>
-
+                <p>Aucune contribution trouvée.</p>
             </div>
-
         `;
 
         return;
 
     }
 
-
     container.innerHTML =
         contributions
-            .map(
-                item => `
+            .map(item => {
 
+                const description =
+                    item.description?.trim() || "";
+
+                const montantAffiche =
+                    Number(item.montant) > 0
+                        ? formatMontant(Number(item.montant))
+                        : "Don en nature";
+
+                return `
                     <article class="history-item">
 
                         <div class="history-header">
 
                             <div>
-
                                 <div class="reference-id">
                                     ${escapeHTML(item.id)}
                                 </div>
@@ -806,45 +987,50 @@ function afficherHistorique() {
                                 <strong>
                                     ${escapeHTML(item.nom)}
                                 </strong>
-
                             </div>
 
                             <div class="amount">
-                                ${
-                                    item.montant > 0
-                                    ? formatMontant(item.montant)
-                                    : "Don en nature"
-                                }
+                                ${escapeHTML(montantAffiche)}
                             </div>
 
                         </div>
-
 
                         <div class="history-details">
 
                             <span>
                                 🎁
-                                ${escapeHTML(item.typeDon)}
+                                ${escapeHTML(item.typeDon || "-")}
                             </span>
 
                             <span>
                                 ❤️
-                                ${escapeHTML(item.destination)}
+                                ${escapeHTML(item.destination || "-")}
                             </span>
+
+                            ${
+                                description
+                                    ? `
+                                        <div class="history-description">
+                                            <strong>📦 Description du don :</strong>
+                                            <span>${escapeHTML(description)}</span>
+                                        </div>
+                                    `
+                                    : ""
+                            }
 
                             <span>
                                 📍
-                                ${escapeHTML(item.zone)}
+                                ${escapeHTML(item.zone || "-")}
                             </span>
 
                             <span>
                                 👤
-                                ${escapeHTML(item.collecteur)}
+                                ${escapeHTML(item.collecteur || "-")}
                             </span>
 
                             <span>
                                 📅
-                                ${escapeHTML(item.dateDon)}
+                                ${escapeHTML(item.dateDon || "-")}
                             </span>
 
                             <span>
@@ -853,7 +1039,6 @@ function afficherHistorique() {
                             </span>
 
                         </div>
-
 
                         <div class="history-actions-row">
 
@@ -874,14 +1059,12 @@ function afficherHistorique() {
                         </div>
 
                     </article>
+                `;
 
-                `
-            )
+            })
             .join("");
 
 }
-
-
 /* =====================================================
    PDF
 ===================================================== */
@@ -1107,6 +1290,11 @@ function genererPDF(data) {
         data.destination
     );
 
+      ligne(
+    "Description du don",
+    data.description || "Non renseignée"
+     );
+
     ligne(
         "Montant",
         data.montant > 0
@@ -1135,13 +1323,11 @@ function genererPDF(data) {
     );
 
 
-    if (data.description) {
-
-        ligne(
-            "Description",
-            data.description
-        );
-
+    if (data.typeDon === "Nature" || data.description) {
+    ligne(
+        "Description du don",
+        data.description || "Non renseignée"
+    );
     }
 
 
@@ -1332,82 +1518,44 @@ function exporterCSV() {
    SUPPRESSION
 ===================================================== */
 
-function supprimerContribution(id) {
-
-    const confirmation =
-        confirm(
-            `Supprimer la contribution ${id} ?`
-        );
-
-
-    if (!confirmation) {
-
-        return;
-
-    }
-
-
-    const data =
-        getContributions()
-            .filter(
-                item =>
-                    item.id !== id
-            );
-
-
-    saveContributions(
-        data
+async function supprimerContribution(id) {
+    const confirmation = confirm(
+        `Supprimer définitivement la contribution ${id} ?`
     );
 
+    if (!confirmation) {
+        return;
+    }
 
-    actualiserDashboard();
+    try {
+        await envoyerVersGoogle({
+            action: "supprimer",
+            id: id
+        });
 
-    afficherHistorique();
+        const existeEncore =
+            contributionsCache.some(item => item.id === id);
 
-}
+        if (existeEncore) {
+            throw new Error(
+                "La contribution existe encore dans Google Sheets."
+            );
+        }
 
+        actualiserDashboard();
+        afficherHistorique();
 
-function supprimerToutesLesDonnees() {
+        alert("Contribution supprimée de Google Sheets.");
 
-    const data =
-        getContributions();
-
-
-    if (!data.length) {
+    } catch (error) {
+        console.error(error);
 
         alert(
-            "Aucune donnée à supprimer."
+            "La suppression n'a pas pu être confirmée. " +
+            "Vérifiez Google Sheets avant de recommencer."
         );
-
-        return;
-
     }
-
-
-    const confirmation =
-        confirm(
-            "ATTENTION : cette action supprimera toutes les contributions enregistrées sur cet appareil. Continuer ?"
-        );
-
-
-    if (!confirmation) {
-
-        return;
-
-    }
-
-
-    localStorage.removeItem(
-        CONFIG.storageKey
-    );
-
-
-    actualiserDashboard();
-
-    afficherHistorique();
-
 }
-
 
 /* =====================================================
    UTILITAIRES

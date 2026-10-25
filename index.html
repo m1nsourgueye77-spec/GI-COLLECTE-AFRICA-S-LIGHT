@@ -759,50 +759,13 @@
                 </div>
 
 
-                <div class="field">
+                      <div class="field">
+                      <label for="modePaiement">Mode de paiement</label>
 
-                    <label>
-                        Mode de paiement
-                    </label>
-
-                    <select id="modePaiement">
-
-                        <option value="">
-                            Sélectionner
-                        </option>
-
-                        <option>
-                            Espèces
-                        </option>
-
-                        <option>
-                            Wave
-                        </option>
-
-                        <option>
-                            Orange Money
-                        </option>
-
-                        <option>
-                            Free Money
-                        </option>
-
-                        <option>
-                            Virement bancaire
-                        </option>
-
-                        <option>
-                            Chèque
-                        </option>
-
-                        <option>
-                            Autre
-                        </option>
-
+                       <select id="modePaiement">
+                       <option value="Wave" selected>Wave</option>
                     </select>
-
-                </div>
-
+                     </div>
 
                 <div class="field">
 
@@ -834,6 +797,38 @@
 
             </div>
 
+              <!-- QR CODE WAVE AFRICA'S LIGHT -->
+<div id="waveQrContainer" class="wave-qr-container">
+
+    <h3>Recevoir un don via Wave</h3>
+
+    <p>
+        Présentez ce QR code au donateur pour qu'il puisse
+        effectuer son paiement avec l'application Wave.
+    </p>
+
+    <figure class="wave-qr-figure">
+
+        <img
+            src="assets/img/qr-wave.png"
+            alt="QR code Wave officiel d'Africa's Light Association"
+            class="wave-qr-image"
+        >
+
+        <figcaption>
+            QR code officiel d'Africa's Light Association
+        </figcaption>
+
+    </figure>
+
+    <p class="wave-qr-warning">
+        Après le paiement, vérifiez la réception des fonds,
+        puis renseignez la référence de transaction avant
+        d'enregistrer la contribution.
+    </p>
+
+</div>
+
         </div>
 
 
@@ -861,6 +856,8 @@
                     </p>
 
                 </div>
+
+              
 
             </div>
 
@@ -1211,6 +1208,10 @@
 </footer>
 
 
+<!-- Bibliothèque PDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<!-- Script de l'application -->
 <script src="script.js"></script>
 
 </body>
